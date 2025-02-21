@@ -1,0 +1,37 @@
+[project]
+name = "endolearn"
+version = "0.1.0"
+description = "PyTorch training for endoscopic disease detection"
+requires-python = "==3.12.*"
+authors = [
+    {name = "Robin Ghyselinck", email = "rghyselinck@gmail.com"},
+]
+dependencies = ["pandas>=2.2.3", "torch>=2.6.0", "pillow>=11.1.0", "torchvision>=0.21.0", "matplotlib>=3.10.0", "wandb>=0.19.6", "scikit-learn>=1.6.1", "tqdm>=4.67.1"]
+readme = "README.md"
+license = {text = "MIT"}
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+select = [
+    "E",
+    "F",
+    "I",
+    "B"
+]
+src = ["src"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.hatch.build.targets.wheel]
+packages = ["endolearn"]
+
+[tool.pdm]
+distribution = false

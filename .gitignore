@@ -1,0 +1,5 @@
+.venv
+wandb
+dist
+# Project exclude paths
+/src/results/
