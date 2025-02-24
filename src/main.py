@@ -84,9 +84,9 @@ def setup_wandb(args):
     """Initialize Weights & Biases for experiment tracking"""
     try:
         import wandb
-        if args.wandbkey:
-            os.environ["WANDB_API_KEY"] = args.wandbkey
 
+        if args.wandb_api_key:
+            os.environ["WANDB_API_KEY"] = args.wandb_api_key
         config = {
             "architecture": args.arch,
             "learning_rate": args.lr,
@@ -136,7 +136,8 @@ def main():
                         default='/Users/rob/projects/explainable_endoscopic_vision/data/labeled-images',
                         help="path to dataset")
     parser.add_argument("--results_path", metavar="DIR_RES", help="path to save results", default="./results")
-    parser.add_argument("--wandbkey", help="API key for Wandb")
+    parser.add_argument("--wandb_api_key", help="API key for Wandb")
+
     parser.add_argument("-a", "--arch", metavar="ARCH", default="resnet50",
                         choices=model_names, help="model architecture: " + " | ".join(model_names))
     parser.add_argument("-j", "--workers",
