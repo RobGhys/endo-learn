@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 #SBATCH --job-name=training_seg
-#SBATCH --array=0-4
+#SBATCH --array=0-0
 #SBATCH --time=48:00:00 # hh:mm:ss
 #
 #SBATCH --ntasks=1
@@ -33,20 +33,8 @@ fi
 # Assign the first command line argument to wandb_api_key
 wandb_api_key=$1
 
-echo "Starting Task #: $SLURM_ARRAY_TASK_ID"
-
-#resume_path="/gpfs/scratch/acad/lysmed/seg-equi-architectures/outputs/coco/UNet_e2cnn/fold_${SLURM_ARRAY_TASK_ID}/checkpoint_epoch_159.pth"
-
-# Check if the resume file exists
-if [ ! -f "$resume_path" ]; then
-    echo "Error: Resume file not found at $resume_path"
-    exit 1
-fi
-
 python src/main.py \
 --data /gpfs/scratch/acad/lysmed/data-kvasir/labeled-images \
 --wandb_api_key $wandb_api_key \
-
-echo "Finished Task #: $SLURM_ARRAY_TASK_ID"
 
 echo "Exiting the program."
