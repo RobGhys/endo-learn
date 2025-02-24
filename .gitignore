@@ -3,3 +3,4 @@ wandb
 dist
 # Project exclude paths
 /src/results/
+results
