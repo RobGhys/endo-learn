@@ -221,6 +221,9 @@ class EndoscopyClassificationTrainer:
                 for k, v in metrics.items():
                     log_dict[f"{phase}_{k}"] = v
 
+                current_lr = self.optimizer.param_groups[0]['lr']
+                log_dict['learning_rate'] = current_lr
+
                 log_dict['epoch'] = epoch
 
                 wandb.log(log_dict)

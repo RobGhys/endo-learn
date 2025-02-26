@@ -14,6 +14,7 @@ from sklearn.model_selection import train_test_split
 
 from datasets.endoscopy_dataset import EndoscopyDataset
 from models.model_manager import get_model
+from trainers.scheduler import get_cosine_schedule_with_warmup
 from trainers.trainer import EndoscopyClassificationTrainer
 from transforms.base_transforms import get_transforms
 
@@ -94,7 +95,9 @@ def setup_wandb(args):
             "epochs": args.epochs,
             "seed": args.seed,
             "weight_decay": args.weight_decay,
-            "num_classes": args.n_classes
+            "num_classes": args.n_classes,
+            "warmup_epochs": args.warmup_epochs,
+            "min_lr": args.min_lr
         }
 
         wandb.init(
@@ -128,7 +131,11 @@ def get_max_workers() -> int:
     return max(1, os.cpu_count() - 1)
 
 def main():
-    model_names = ['resnet18', 'resnet50', 'vgg19']
+    model_names = [
+        'resnet18', 'resnet50', 'vgg19',
+        'vit_base', 'vit_small',
+        'efficientnet_b0', 'efficientnet_b1', 'efficientnet_b2'
+    ]
 
     parser = argparse.ArgumentParser(description="Endoscopy Classification Training")
     parser.add_argument("--data",
@@ -157,6 +164,10 @@ def main():
     parser.add_argument('--epochs', default=100, type=int, help='Number of total epochs to run')
     parser.add_argument('--snapshot-interval', default=10, type=int,
                         help='How often to save model snapshots')
+    parser.add_argument("--warmup-epochs", default=5, type=int,
+                        help="number of warmup epochs for scheduler")
+    parser.add_argument("--min-lr", default=1e-6, type=float,
+                        help="minimum learning rate at end of training")
 
     args = parser.parse_args()
 
@@ -194,12 +205,21 @@ def main():
     )
 
     # Set up learning rate scheduler
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-        optimizer,
-        T_max=args.epochs,
-        eta_min=1e-5,
-        last_epoch=-1
-    )
+    custom_sched: bool = True
+    if custom_sched:
+        scheduler = get_cosine_schedule_with_warmup(
+            optimizer=optimizer,
+            warmup_epochs=args.warmup_epochs,
+            max_epochs=args.epochs,
+            min_lr=args.min_lr
+        )
+    else:
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer,
+            T_max=args.epochs,
+            eta_min=1e-5,
+            last_epoch=-1
+        )
 
     # Set up wandb for logging
     wandb_run = setup_wandb(args)
